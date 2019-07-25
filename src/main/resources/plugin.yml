@@ -1,0 +1,37 @@
+name: Wastelands
+version: ${project.version}
+main: henry232323.wastelands.Wastelands
+authors: [henry232323]
+description: A plugin for ResortCraft's Wastelands gamemode
+depends: [Vault, GroupManager]
+
+permissions:
+  wastelands.*:
+    description: All permissions for wastelands
+    children:
+      wastelands.bounties: true
+      wastelands.reload: true
+      wastelands.setbounty: true
+  wastelands.bounties:
+    description: View the available bounties for the server or for a player
+    default: true
+  wastelands.setbounty:
+    description: Gives access to viewing the leaderboard
+    default: true
+  wastelands.reload:
+      description: Gives access to reloading the plugin
+      default: op
+
+commands:
+  bounties:
+    description: View the leaderboard for a parkour
+    permission: parkour.bounties
+    usage: "§cSyntax error! Usage: /bounties OR /bounties <player>"
+  setbounty:
+    description: Set a bounty on another player
+    permission: wastelands.setbounty
+    usage: "§cSyntax error! Usage: /setbounty <player> <amount>"
+  wastelands:
+    description: Reload the Wastelands plugin
+    permission: wastelands.reload
+    usage: "§cSyntax error! Usage: /wastelands <--|reload>"
