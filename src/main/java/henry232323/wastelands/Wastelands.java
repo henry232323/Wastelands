@@ -92,6 +92,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         LivingEntity kent = event.getEntity().getKiller();
+        System.out.println(kent);
         if (kent instanceof Player) {
             Player killer = (Player) kent;
             Player player = event.getEntity();
@@ -142,6 +143,8 @@ public final class Wastelands extends JavaPlugin implements Listener {
 
                 BountyData bdata = BountyData.load(this, target);
                 bdata.addBounty((Player) sender, amount);
+
+                return true;
             }
 
             return false;

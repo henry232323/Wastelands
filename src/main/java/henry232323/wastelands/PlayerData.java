@@ -3,6 +3,7 @@ package henry232323.wastelands;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -29,7 +30,7 @@ TODO:
     - Player kills
  */
 
-public class PlayerData {
+public class PlayerData implements Serializable {
     ArrayList<UUID> killed;
     private int kills;
     private int payout;

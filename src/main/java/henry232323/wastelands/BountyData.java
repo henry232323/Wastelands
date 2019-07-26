@@ -2,9 +2,9 @@ package henry232323.wastelands;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ TODO:
     - Player kills
  */
 
-public class BountyData {
+public class BountyData implements Serializable {
     private ArrayList<Pair<UUID, Float>> bounties;
     private String playerUUID;
 
@@ -66,6 +66,7 @@ public class BountyData {
         BountyData data = (BountyData) io.load(file);
         if (data == null) {
             data = new BountyData(player);
+            data.setPlugin(plugin);
             data.save();
         }
         data.setPlugin(plugin);
@@ -86,6 +87,7 @@ public class BountyData {
             player.sendMessage("§cYou do not have sufficient funds");
             return;
         }
+        player.sendMessage("§2Successfully set bounty");
 
         Pair<UUID, Float> item = new Pair(player.getUniqueId(), amount);
         bounties.add(item);
