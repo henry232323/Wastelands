@@ -31,22 +31,23 @@ TODO:
  */
 
 public class PlayerData implements Serializable {
-    ArrayList<UUID> killed;
+    private ArrayList<UUID> killed;
     private int kills;
     private int payout;
-    String playerUUID;
+    private String playerUUID;
 
     transient private Wastelands plugin;
 
-    PlayerData(Player player) {
+    private PlayerData(Wastelands plugin, Player player) {
         killed = new ArrayList<>();
         kills = 0;
-        payout = getPlugin().getBasePayout();
+        setPlugin(plugin);
+        payout = plugin.getBasePayout();
         playerUUID = player.getUniqueId().toString();
     }
 
     public void save() {
-        String path = String.format("%s.dat", File.separator, playerUUID);
+        String path = String.format("%s.dat", playerUUID);
         File ranksdir = new File(plugin.getDataFolder(), "ranks");
         if (!ranksdir.exists()) {
             ranksdir.mkdir();
@@ -55,12 +56,18 @@ public class PlayerData implements Serializable {
         io.save(this, file);
     }
 
-    public static PlayerData load(Wastelands plugin, Player player) {
-        PlayerData data = (PlayerData) io.load(new File(plugin.getDataFolder(), String.format("ranks%s%s.dat", File.separator, player.getUniqueId().toString())));
-        if (data == null) {
-            data = new PlayerData(player);
+    static PlayerData load(Wastelands plugin, Player player) {
+        String path = String.format("%s.dat", player.getUniqueId().toString());
+        File playerdir = new File(plugin.getDataFolder(), "ranks");
+        if (!playerdir.exists()) {
+            playerdir.mkdir();
         }
-        data.save();
+        File file = new File(playerdir, path);
+        PlayerData data = (PlayerData) io.load(file);
+        if (data == null) {
+            data = new PlayerData(plugin, player);
+            data.save();
+        }
         data.setPlugin(plugin);
         return data;
     }

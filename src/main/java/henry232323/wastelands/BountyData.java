@@ -1,6 +1,8 @@
 package henry232323.wastelands;
 
 import net.milkbowl.vault.economy.EconomyResponse;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -45,7 +47,7 @@ public class BountyData implements Serializable {
     }
 
     void save() {
-        String path = String.format("%s.dat", File.separator, playerUUID);
+        String path = String.format("%s.dat", playerUUID);
         File bountydir = new File(plugin.getDataFolder(), "bounties");
         if (!bountydir.exists()) {
             bountydir.mkdir();
@@ -56,7 +58,7 @@ public class BountyData implements Serializable {
     }
 
     static BountyData load(Wastelands plugin, Player player) {
-        String path = String.format("%s.dat", File.separator, player.getUniqueId().toString());
+        String path = String.format("%s.dat", player.getUniqueId().toString());
         File bountydir = new File(plugin.getDataFolder(), "bounties");
         if (!bountydir.exists()) {
             bountydir.mkdir();
@@ -84,28 +86,37 @@ public class BountyData implements Serializable {
     void addBounty(Player player, float amount) {
         EconomyResponse resp = plugin.getEconomy().withdrawPlayer(player, amount);
         if (!resp.transactionSuccess()) {
-            player.sendMessage("§cYou do not have sufficient funds");
+            player.sendMessage(ChatColor.RED + "You do not have sufficient funds");
             return;
         }
-        player.sendMessage("§2Successfully set bounty");
+        player.sendMessage(ChatColor.GOLD + "Successfully set bounty");
 
-        Pair<UUID, Float> item = new Pair(player.getUniqueId(), amount);
+        Pair<UUID, Float> item = new Pair<>(player.getUniqueId(), amount);
         bounties.add(item);
     }
 
     void clearBounties(Player killer) {
+        if (bounties.size() == 0) {
+            return;
+        }
         float total = 0.0f;
         for (Pair<UUID, Float> bounty : bounties) {
             total += bounty.getValue();
         }
         bounties.clear();
 
-        Player player = getServer().getPlayer(playerUUID);
-        plugin.getEconomy().depositPlayer(player, total);
+        Player player = getServer().getPlayer(UUID.fromString(playerUUID));
+        plugin.getEconomy().depositPlayer(killer, total);
 
         String playerName = player.getName();
         String killerName = killer.getName();
-        String finalMessage = String.format("%s has claimed the bounties on %s for %s", killerName, playerName, total);
+        String finalMessage = String.format(ChatColor.GOLD + "%s has claimed the bounties on %s for $%s total", killerName, playerName, total);
+        killer.sendMessage(ChatColor.GREEN + String.format("$%s has been added to your account.", total));
         plugin.getServer().broadcastMessage(finalMessage);
+        save();
+    }
+
+    public ArrayList<Pair<UUID,Float>> getBounties() {
+        return bounties;
     }
 }
