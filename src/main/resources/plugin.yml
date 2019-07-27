@@ -34,4 +34,4 @@ commands:
   wastelands:
     description: Reload the Wastelands plugin
     permission: wastelands.reload
-    usage: "§cSyntax error! Usage: /wastelands <--|reload>"
+    usage: "§cSyntax error! Usage: /wastelands <reload>"

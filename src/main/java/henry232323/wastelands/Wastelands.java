@@ -116,7 +116,12 @@ public final class Wastelands extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
             if (command.getName().equalsIgnoreCase("wastelands")) {
-                if (args.length != 1) {
+                if (args.length == 0) {
+                    String version = getDescription().getVersion();
+                    sender.sendMessage(ChatColor.GOLD + "Wastelands Version " + version);
+                    return true;
+                }
+                else if (args.length != 1) {
                     return false;
                 }
                 if (args[0].equalsIgnoreCase("reload")) {
