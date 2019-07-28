@@ -41,7 +41,7 @@ public class BountyData implements Serializable {
 
     transient private Wastelands plugin;
 
-    BountyData(Player player) {
+    BountyData(OfflinePlayer player) {
         bounties = new ArrayList<>();
         playerUUID = player.getUniqueId().toString();
     }
@@ -57,7 +57,7 @@ public class BountyData implements Serializable {
         io.save(this, file);
     }
 
-    static BountyData load(Wastelands plugin, Player player) {
+    static BountyData load(Wastelands plugin, OfflinePlayer player) {
         String path = String.format("%s.dat", player.getUniqueId().toString());
         File bountydir = new File(plugin.getDataFolder(), "bounties");
         if (!bountydir.exists()) {

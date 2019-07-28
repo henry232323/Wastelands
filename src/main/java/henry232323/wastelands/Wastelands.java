@@ -2,6 +2,7 @@ package henry232323.wastelands;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -117,8 +118,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
                     String version = getDescription().getVersion();
                     sender.sendMessage(ChatColor.GOLD + "Wastelands Version " + version);
                     return true;
-                }
-                else if (args.length != 1) {
+                } else if (args.length != 1) {
                     return false;
                 }
                 if (args[0].equalsIgnoreCase("reload")) {
@@ -144,22 +144,28 @@ public final class Wastelands extends JavaPlugin implements Listener {
                     return false;
                 }
 
-                Player target = getServer().getPlayer(args[0]);
+                OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
+                if (target == null) {
+                    sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "Player not found.");
+                }
                 float amount = Float.valueOf(args[1]);
 
                 BountyData bdata = BountyData.load(this, target);
                 bdata.addBounty((Player) sender, amount);
                 bdata.save();
+                String playerName = target.getName();
+                String killerName = sender.getName();
+                getServer().broadcastMessage(String.format(ChatColor.GOLD + "%s has set a bounty on %s for $%s", killerName, playerName, amount));
 
                 return true;
             }
 
             if (command.getName().equalsIgnoreCase("bounties")) {
                 if (args.length == 1) {
-                    Player player = getServer().getPlayer(args[0]);
+                    OfflinePlayer player = getServer().getOfflinePlayer(args[0]);
                     if (player == null) {
                         sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED
-                                 + "Player not found.");
+                                + "Player not found.");
                         return true;
                     }
                     BountyData bdata = BountyData.load(this, player);
@@ -174,7 +180,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
                         sender.sendMessage(String.format(ChatColor.GOLD + "No bounties found for %s", player.getName()));
                     }
                     return true;
-                } else if (args.length == 0){
+                } else if (args.length == 0) {
                     int count = 0;
                     for (Player player : getServer().getOnlinePlayers()) {
                         BountyData bdata = BountyData.load(this, player);
