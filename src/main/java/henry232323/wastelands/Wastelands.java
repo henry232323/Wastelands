@@ -28,18 +28,15 @@ TODO:
     - People can add $$ to bounty
     - See current bounties for online players
     - Check bounties for a player
-
-  Save Structure:
+  6. Save Structure:
     Wastelands/config.yml
     - Wastelands world name
     - Base payout
     - Increase per unique kill
     - Rank-below decrease
-
-    Wastelands/playerdata/UUID-b.dat
+  7. Wastelands/playerdata/UUID-b.dat
     - Current Bounties on that player
-
-    Wastelands/playerdata/UUID-k.dat
+  8. Wastelands/playerdata/UUID-k.dat
     - Player level
     - Player kills
  */
