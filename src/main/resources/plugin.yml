@@ -3,24 +3,28 @@ version: ${project.version}
 main: henry232323.wastelands.Wastelands
 authors: [henry232323]
 description: A plugin for ResortCraft's Wastelands gamemode
-depends: [Vault, GroupManager]
+depends: [Vault]
 
 permissions:
   wastelands.*:
     description: All permissions for wastelands
     children:
-      wastelands.bounties: true
       wastelands.reload: true
+      wastelands.bounties: true
       wastelands.setbounty: true
+      wastelands.bounty.claim: true
+  wastelands.reload:
+    description: Gives access to reloading the plugin
+    default: op
   wastelands.bounties:
     description: View the available bounties for the server or for a player
     default: true
   wastelands.setbounty:
     description: Gives access to viewing the leaderboard
     default: true
-  wastelands.reload:
-      description: Gives access to reloading the plugin
-      default: op
+  wastelands.bounty.claim:
+    description: Allows players to claim bounties in the given world
+    default: false
 
 commands:
   bounties:

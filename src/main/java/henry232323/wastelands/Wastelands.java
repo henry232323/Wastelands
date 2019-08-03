@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
 
         String worldName = config.getString("wastelands-world");
         if (worldName == null) {
-            worldName = "world";
+            worldName = getServer().getWorlds().get(0).getName();
             config.options().copyDefaults(true);
             wastelandsWorld = getServer().getWorld(worldName);
             config.set("wastelands-world", worldName);
@@ -91,22 +92,36 @@ public final class Wastelands extends JavaPlugin implements Listener {
     }
 
     @EventHandler
+    public void onExpGain(PlayerExpChangeEvent event) {
+        if (event.getPlayer().getWorld() == wastelandsWorld) {
+            if (event.getPlayer().getLevel() >= 35 && event.getAmount() > 0) {
+                event.setAmount(0);
+                event.getPlayer().setLevel(35);
+            }
+        }
+    }
+
+    @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         LivingEntity kent = event.getEntity().getKiller();
         if (kent != null) {
             Player killer = (Player) kent;
             Player player = event.getEntity();
 
-            PlayerData playerData = PlayerData.load(this, killer);
-            playerData.addKilled(player);
+            if (event.getEntity().getWorld() == wastelandsWorld) {
+                PlayerData playerData = PlayerData.load(this, killer);
+                playerData.addKilled(player);
+                economy.depositPlayer(killer, playerData.getPayout());
+                killer.sendMessage(ChatColor.GREEN + String.format("$%s has been added to your account.", playerData.getPayout()));
 
-            economy.depositPlayer(killer, playerData.getPayout());
-            killer.sendMessage(ChatColor.GREEN + String.format("$%s has been added to your account.", playerData.getPayout()));
+                playerData.save();
+            }
 
-            playerData.save();
 
-            BountyData bdata = BountyData.load(this, player);
-            bdata.clearBounties(killer);
+            if (event.getEntity().hasPermission("wastelands.bounty.claim")) {
+                BountyData bdata = BountyData.load(this, player);
+                bdata.clearBounties(killer);
+            }
         }
     }
 
