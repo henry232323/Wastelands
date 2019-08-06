@@ -1,38 +1,19 @@
 package henry232323.wastelands;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
-/*
-TODO:
-  1. Track kills
-  2. More money for each unique kill
-  3. Decrease rank when getting killed by a high level
-  4. Rank based off top n%
-  5. Bounties
-    - /bounty (playername) ($ amount)
-    - bounty sends a broadcast with $$ amount
-    - People can add  $$ to bounty
-    - See current bounties for online players
-    - Check bounties for a player
-
-  Save Structure:
-    Wastelands/config.yml
-    Wastelands/playerdata/UUID-b.dat
-    - Current Bounties on that player
-
-    Wastelands/playerdata/UUID-k.dat
-    - Player level
-    - Player kills
- */
 
 public class PlayerData implements Serializable {
     private ArrayList<UUID> killed;
     private int kills;
+    private int rankPoints;
     private int payout;
     private String playerUUID;
 
@@ -72,21 +53,70 @@ public class PlayerData implements Serializable {
         return data;
     }
 
-    public Wastelands getPlugin() {
-        return plugin;
-    }
-
-    public void setPlugin(Wastelands plugin) {
+    void setPlugin(Wastelands plugin) {
         this.plugin = plugin;
     }
 
-    public void addKilled(Player player) {
-        UUID uuid = player.getUniqueId();
+    public void addKilled(Player killedPlayer) {
+        UUID uuid = killedPlayer.getUniqueId();
+        OfflinePlayer player = plugin.getServer().getOfflinePlayer(UUID.fromString(playerUUID));
         if (!killed.contains(uuid)) {
             killed.add(uuid);
         }
 
+        int oldRank = rankPoints;
+
+        PlayerData killedData = PlayerData.load(plugin, killedPlayer);
+        int eRank = killedData.rankPoints;
+        int oldERank = eRank;
+
+        if (rankPoints >= eRank) {
+            rankPoints += Math.floor((eRank*5)-((rankPoints/10)*5)+10);
+        } else {
+            rankPoints += Math.floor((eRank*10)+(rankPoints * (eRank-rankPoints)));
+        }
+
         kills += 1;
+        save();
+
+        if (eRank > 5) {
+            killedData.rankPoints -=  Math.floor(eRank*((Math.random() * 1.6) + 1.35));
+            killedData.save();
+        }
+
+        Leaderboard leaderboard = plugin.getLeaderboard();
+        HashMap<String, Integer> scores = leaderboard.load();
+        scores.put(playerUUID, rankPoints);
+        scores.put(killedData.playerUUID, killedData.rankPoints);
+
+        int newPercentile = percentToRank((float) rankPoints/scores.size());
+        int newEPercentile = percentToRank((float) killedData.rankPoints/scores.size());
+        int oldPercentile = percentToRank((float) oldRank/scores.size());
+        int oldEPercentile = percentToRank((float) oldERank/scores.size());
+
+        if (newPercentile != oldPercentile) {
+            String rankname = String.format("Wastelands%s", newPercentile);
+            String command = String.format("manuadd %s %s %s", player.getName(), rankname, "Wastelands");
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+        }
+
+        if (newEPercentile != oldEPercentile) {
+            String rankname = String.format("Wastelands%s", newEPercentile);
+            String command = String.format("manuadd %s %s %s", killedPlayer.getName(), rankname, "Wastelands");
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+        }
+
+        leaderboard.save(scores);
+    }
+
+    private int percentToRank(float percent) {
+        if (percent > .9) {
+            return 3;
+        }
+        if (percent > .5) {
+            return 2;
+        }
+        return 1;
     }
 
     public int getPayout() {

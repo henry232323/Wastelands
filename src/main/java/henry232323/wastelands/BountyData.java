@@ -12,28 +12,6 @@ import java.util.UUID;
 
 import static org.bukkit.Bukkit.getServer;
 
-/*
-TODO:
-  1. Track kills
-  2. More money for each unique kill
-  3. Decrease rank when getting killed by a high level
-  4. Rank based off top n%
-  5. Bounties
-    - /bounty (playername) ($ amount)
-    - bounty sends a broadcast with $$ amount
-    - People can add  $$ to bounty
-    - See current bounties for online players
-    - Check bounties for a player
-
-  Save Structure:
-    Wastelands/config.yml
-    Wastelands/playerdata/UUID-b.dat
-    - Current Bounties on that player
-
-    Wastelands/playerdata/UUID-k.dat
-    - Player level
-    - Player kills
- */
 
 public class BountyData implements Serializable {
     private ArrayList<Pair<UUID, Float>> bounties;
@@ -73,10 +51,6 @@ public class BountyData implements Serializable {
         }
         data.setPlugin(plugin);
         return data;
-    }
-
-    public Wastelands getPlugin() {
-        return plugin;
     }
 
     void setPlugin(Wastelands plugin) {

@@ -16,6 +16,8 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /*
@@ -41,6 +43,7 @@ TODO:
   8. Wastelands/playerdata/UUID-k.dat
     - Player level
     - Player kills
+  9. Cap level at 35 in Wastelands
  */
 
 public final class Wastelands extends JavaPlugin implements Listener {
@@ -49,6 +52,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
     private World wastelandsWorld;
     FileConfiguration config;
     private Economy economy;
+    private Leaderboard leaderboard;
 
     @Override
     public void onEnable() {
@@ -67,13 +71,15 @@ public final class Wastelands extends JavaPlugin implements Listener {
         String worldName = config.getString("wastelands-world");
         if (worldName == null) {
             worldName = getServer().getWorlds().get(0).getName();
-            config.options().copyDefaults(true);
-            wastelandsWorld = getServer().getWorld(worldName);
-            config.set("wastelands-world", worldName);
-            saveConfig();
         }
 
+        config.options().copyDefaults(true);
+        wastelandsWorld = getServer().getWorld(worldName);
+        config.set("wastelands-world", worldName);
+        saveConfig();
+
         basePayout = config.getInt("base-payout");
+        leaderboard = new Leaderboard(this);
 
         saveConfig();
     }
@@ -107,7 +113,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
         if (kent != null) {
             Player killer = (Player) kent;
             Player player = event.getEntity();
-
+            
             if (event.getEntity().getWorld() == wastelandsWorld) {
                 PlayerData playerData = PlayerData.load(this, killer);
                 playerData.addKilled(player);
@@ -216,6 +222,15 @@ public final class Wastelands extends JavaPlugin implements Listener {
                     return true;
                 }
             }
+            if (command.getName().equalsIgnoreCase("leaderboard")) {
+                ArrayList<OfflinePlayer> top = leaderboard.getTop(10);
+                sender.sendMessage("§6Wastelands Leaderboard");
+                for (int i = 0; i < top.size(); i++) {
+                        sender.sendMessage(String.format("%s %s", i + 1, top.get(i).getName()));
+                }
+
+                return true;
+            }
 
             return false;
         } catch (Exception e) {
@@ -226,5 +241,9 @@ public final class Wastelands extends JavaPlugin implements Listener {
 
     public Economy getEconomy() {
         return economy;
+    }
+
+    public Leaderboard getLeaderboard() {
+        return leaderboard;
     }
 }

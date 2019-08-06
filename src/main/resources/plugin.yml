@@ -1,9 +1,9 @@
 name: Wastelands
-version: ${project.version}
+version: 1.0-SNAPSHOT
 main: henry232323.wastelands.Wastelands
 authors: [henry232323]
 description: A plugin for ResortCraft's Wastelands gamemode
-depends: [Vault]
+depends: [Vault, GroupManager]
 
 permissions:
   wastelands.*:
@@ -25,6 +25,12 @@ permissions:
   wastelands.bounty.claim:
     description: Allows players to claim bounties in the given world
     default: false
+  wastelands.leaderboard:
+    description: Check the kill leaderboard for Wastelands
+    default: true
+  wastelands.checkrank:
+    description: Check your current rank overall
+    default: true
 
 commands:
   bounties:
@@ -39,3 +45,7 @@ commands:
     description: Reload the Wastelands plugin
     permission: wastelands.reload
     usage: "§cSyntax error! Usage: /wastelands <reload>"
+  leaderboard:
+    description: Check the kill leaderboard for Wastelands
+    permission: wastelands.leaderboard
+    usage: "§cSyntax error! Usage: /leaderboard"
