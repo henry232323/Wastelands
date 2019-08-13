@@ -1,5 +1,5 @@
 name: Wastelands
-version: 1.0-SNAPSHOT
+version: ${project.version}
 main: henry232323.wastelands.Wastelands
 authors: [henry232323]
 description: A plugin for ResortCraft's Wastelands gamemode
@@ -13,6 +13,8 @@ permissions:
       wastelands.bounties: true
       wastelands.setbounty: true
       wastelands.bounty.claim: true
+      wastelands.checkrank: true
+      wastelands.leaderboard: true
   wastelands.reload:
     description: Gives access to reloading the plugin
     default: op
@@ -29,7 +31,7 @@ permissions:
     description: Check the kill leaderboard for Wastelands
     default: true
   wastelands.checkrank:
-    description: Check your current rank overall
+    description: Check a player's current rank overall
     default: true
 
 commands:
@@ -49,3 +51,7 @@ commands:
     description: Check the kill leaderboard for Wastelands
     permission: wastelands.leaderboard
     usage: "§cSyntax error! Usage: /leaderboard"
+  checkrank:
+    description: Check a player's current rank overall
+    permission: wastelands.checkrank
+    usage: "§cSyntax error! Usage: /checkrank <player>"

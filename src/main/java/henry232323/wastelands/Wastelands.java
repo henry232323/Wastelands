@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -99,7 +98,7 @@ public final class Wastelands extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onExpGain(PlayerExpChangeEvent event) {
-        if (event.getPlayer().getWorld() == wastelandsWorld) {
+        if (event.getPlayer().getWorld().equals(wastelandsWorld)) {
             if (event.getPlayer().getLevel() >= 35 && event.getAmount() > 0) {
                 event.setAmount(0);
                 event.getPlayer().setLevel(35);
@@ -109,11 +108,10 @@ public final class Wastelands extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        LivingEntity kent = event.getEntity().getKiller();
-        if (kent != null) {
-            Player killer = (Player) kent;
+        Player killer = event.getEntity().getKiller();
+        if (killer != null) {
             Player player = event.getEntity();
-            
+
             if (event.getEntity().getWorld() == wastelandsWorld) {
                 PlayerData playerData = PlayerData.load(this, killer);
                 playerData.addKilled(player);
@@ -165,11 +163,11 @@ public final class Wastelands extends JavaPlugin implements Listener {
                     return false;
                 }
 
-                OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
+                Player target = getServer().getPlayer(args[0]);
                 if (target == null) {
                     sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "Player not found.");
                 }
-                float amount = Float.valueOf(args[1]);
+                float amount = Float.parseFloat(args[1]);
 
                 BountyData bdata = BountyData.load(this, target);
                 bdata.addBounty((Player) sender, amount);
@@ -184,11 +182,6 @@ public final class Wastelands extends JavaPlugin implements Listener {
             if (command.getName().equalsIgnoreCase("bounties")) {
                 if (args.length == 1) {
                     OfflinePlayer player = getServer().getOfflinePlayer(args[0]);
-                    if (player == null) {
-                        sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED
-                                + "Player not found.");
-                        return true;
-                    }
                     BountyData bdata = BountyData.load(this, player);
                     if (bdata.getBounties().size() > 0) {
                         sender.sendMessage(String.format(ChatColor.GOLD + "Bounties for %s", player.getName()));
@@ -228,6 +221,22 @@ public final class Wastelands extends JavaPlugin implements Listener {
                 for (int i = 0; i < top.size(); i++) {
                         sender.sendMessage(String.format("%s %s", i + 1, top.get(i).getName()));
                 }
+
+                return true;
+            }
+
+            if (command.getName().equalsIgnoreCase("checkrank")) {
+                Player player = getServer().getPlayer(args[0]);
+                if (player == null) {
+                    sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "Player not found.");
+                    return true;
+                }
+                sender.sendMessage("§6Player Data");
+                PlayerData target = PlayerData.load(this, player);
+                sender.sendMessage("§6Kills: " + target.getKills());
+                float[] rp = leaderboard.getRankPercentile(player);
+                sender.sendMessage("§6Rank: #" + (int) (rp[0] + 1));
+                sender.sendMessage("§6Percentile: Top " + (100 - Math.round(rp[1] * 100)) + "%");
 
                 return true;
             }

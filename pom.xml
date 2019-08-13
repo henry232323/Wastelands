@@ -6,7 +6,7 @@
 
     <groupId>henry232323</groupId>
     <artifactId>Wastelands</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1.2</version>
     <packaging>jar</packaging>
 
     <name>Wastelands</name>

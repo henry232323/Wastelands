@@ -32,19 +32,30 @@ public class Leaderboard implements Serializable {
         ArrayList<String> leaderboardByKey = new ArrayList<>(data.keySet());
         Collections.sort(leaderboardByKey);
 
+        return leaderboardByKey.indexOf(player.getUniqueId().toString());
+    }
+
+    public float[] getRankPercentile(OfflinePlayer player) {
+        float[] rp = new float[2];
+        HashMap<String, Integer> data = load();
+        ArrayList<String> leaderboardByKey = new ArrayList<>(data.keySet());
+        leaderboardByKey.sort(Comparator.comparing(data::get));
+
         int rank = leaderboardByKey.indexOf(player.getUniqueId().toString());
-        return (int) Math.floor((float) rank/leaderboardByKey.size() * 20) + 1;
+        rp[0] = rank;
+        rp[1] = (float) rank / leaderboardByKey.size();
+        return rp;
     }
 
     public int[] getRanks(OfflinePlayer[] players) {
         HashMap<String, Integer> data = load();
         ArrayList<String> leaderboardByKey = new ArrayList<>(data.keySet());
-        Collections.sort(leaderboardByKey);
+        leaderboardByKey.sort(Comparator.comparing(data::get));
 
         int[] ranks = new int[players.length];
         for (int i = 0; i < players.length; i++) {
             int prank = leaderboardByKey.indexOf(players[i].getUniqueId().toString());
-            ranks[i] = (int) Math.floor((float) prank/leaderboardByKey.size() * 20) + 1;
+            ranks[i] = prank;
         }
 
         return ranks;
