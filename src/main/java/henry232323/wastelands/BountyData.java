@@ -57,16 +57,21 @@ public class BountyData implements Serializable {
         this.plugin = plugin;
     }
 
-    void addBounty(Player player, float amount) {
+    boolean addBounty(Player player, float amount) {
+        if (amount <= 0) {
+            player.sendMessage(ChatColor.RED + "Invalid amount");
+            return false;
+        }
         EconomyResponse resp = plugin.getEconomy().withdrawPlayer(player, amount);
         if (!resp.transactionSuccess()) {
             player.sendMessage(ChatColor.RED + "You do not have sufficient funds");
-            return;
+            return false;
         }
         player.sendMessage(ChatColor.GOLD + "Successfully set bounty");
 
         Pair<UUID, Float> item = new Pair<>(player.getUniqueId(), amount);
         bounties.add(item);
+        return true;
     }
 
     void clearBounties(Player killer) {

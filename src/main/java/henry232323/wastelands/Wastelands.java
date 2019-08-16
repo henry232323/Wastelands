@@ -70,12 +70,11 @@ public final class Wastelands extends JavaPlugin implements Listener {
         String worldName = config.getString("wastelands-world");
         if (worldName == null) {
             worldName = getServer().getWorlds().get(0).getName();
+            config.options().copyDefaults(true);
+            wastelandsWorld = getServer().getWorld(worldName);
+            config.set("wastelands-world", worldName);
+            saveConfig();
         }
-
-        config.options().copyDefaults(true);
-        wastelandsWorld = getServer().getWorld(worldName);
-        config.set("wastelands-world", worldName);
-        saveConfig();
 
         basePayout = config.getInt("base-payout");
         leaderboard = new Leaderboard(this);
@@ -145,17 +144,19 @@ public final class Wastelands extends JavaPlugin implements Listener {
 
                     String worldName = config.getString("wastelands-world");
                     if (worldName == null) {
-                        worldName = "world";
+                        worldName = getServer().getWorlds().get(0).getName();
                         config.options().copyDefaults(true);
                         wastelandsWorld = getServer().getWorld(worldName);
                         config.set("wastelands-world", worldName);
-                        saveConfig();
                     }
 
+                    saveConfig();
+
                     basePayout = config.getInt("base-payout");
+                    leaderboard = new Leaderboard(this);
+                    sender.sendMessage(ChatColor.GOLD + "Wastelands reloaded");
                     return true;
                 }
-                sender.sendMessage(ChatColor.GOLD + "Wastelands reloaded");
             }
 
             if (command.getName().equalsIgnoreCase("setbounty")) {
@@ -170,7 +171,10 @@ public final class Wastelands extends JavaPlugin implements Listener {
                 float amount = Float.parseFloat(args[1]);
 
                 BountyData bdata = BountyData.load(this, target);
-                bdata.addBounty((Player) sender, amount);
+                boolean success = bdata.addBounty((Player) sender, amount);
+                if (!success) {
+                    return true;
+                }
                 bdata.save();
                 String playerName = target.getName();
                 String killerName = sender.getName();

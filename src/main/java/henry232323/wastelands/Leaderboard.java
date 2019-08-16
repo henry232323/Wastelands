@@ -42,6 +42,11 @@ public class Leaderboard implements Serializable {
         leaderboardByKey.sort(Comparator.comparing(data::get));
 
         int rank = leaderboardByKey.indexOf(player.getUniqueId().toString());
+        if (rank == -1) {
+            rp[0] = leaderboardByKey.size();
+            rp[1] = rp[0];
+            return rp;
+        }
         rp[0] = rank;
         rp[1] = (float) rank / leaderboardByKey.size();
         return rp;
